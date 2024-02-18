@@ -13,7 +13,7 @@ import {STRING} from "sequelize";
         ConfigModule.forRoot({
             envFilePath: `.${process.env.NODE_ENV}.env`
         }),
-        SequelizeModule.forRoot({
+        /*SequelizeModule.forRoot({
             dialect: 'postgres',
             host: process.env.POSTGRES_HOST,
             port: Number(process.env.POSTGRES_PORT),
@@ -23,7 +23,7 @@ import {STRING} from "sequelize";
             models: [],
             synchronize: true,
             autoLoadModels: true
-        }),
+        }),*/
         UsersModule,],
     controllers: [AppController],
     providers: [AppService]
