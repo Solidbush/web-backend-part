@@ -14,7 +14,7 @@ import {HttpModule} from "@nestjs/axios";
         ConfigModule.forRoot({
             envFilePath: `.${process.env.NODE_ENV}.env`
         }),
-        /*SequelizeModule.forRoot({
+        SequelizeModule.forRoot({
             dialect: 'postgres',
             host: process.env.POSTGRES_HOST,
             port: Number(process.env.POSTGRES_PORT),
@@ -24,8 +24,8 @@ import {HttpModule} from "@nestjs/axios";
             models: [User],
             synchronize: true,
             autoLoadModels: true
-        })*/
-        /*UsersModule*/ HttpModule],
+        }),
+        UsersModule, HttpModule],
     controllers: [AppController],
     providers: [AppService]
 })
