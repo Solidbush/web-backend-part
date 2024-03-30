@@ -22,7 +22,7 @@ export class User extends Model<User, UserCreationAttributes> {
     @ApiProperty({description: 'User password', example: 'dev123'})
     @Column({type: DataType.STRING, allowNull: false})
     password: string;
-
+  
     @ApiProperty({description: 'User status', example: false})
     @Column({type: DataType.BOOLEAN, defaultValue: false})
     banned: boolean;
