@@ -3,9 +3,13 @@ import {InjectModel} from "@nestjs/sequelize";
 import {Course} from "./course.model";
 import {FilesService} from "../files/files.service";
 import {CreateCourseDto} from "./dto/create-course.dto";
-import {DeleteCourseDto} from "./dto/delete-course.dto";
 import {UpdateCourseDto} from "./dto/update-course.dto";
 import {Lesson} from "../lessons/lesson.model";
+import {Chapter} from "../chapters/chapter.model";
+import {Paragraph} from "../paragraphs/paragraph.model";
+import {Task} from "../tasks/task.model";
+import {Question} from "../questions/question.model";
+import {Problem} from "../problems/problem.model";
 
 @Injectable()
 export class CoursesService {
@@ -27,13 +31,13 @@ export class CoursesService {
     async getCourse(course_id: number) {
         return await this.courseRepository.findAll({
             where: {id: course_id},
-            include: {model: Lesson}
+            include: {model: Lesson, include: [{model: Chapter, include: [{model: Paragraph}]}, {model: Task, include: [{model: Question}, {model: Problem}]}]}
         })
     }
 
-    async deleteCourse(dto: DeleteCourseDto) {
+    async deleteCourse(course_id: number) {
         let course = await this.courseRepository.findAll({
-            where: {id: dto.course_id}
+            where: {id: course_id}
         })
 
         if (course.length > 0) {
@@ -41,7 +45,7 @@ export class CoursesService {
         }
 
         return await this.courseRepository.destroy({
-            where: {id: dto.course_id}
+            where: {id: course_id}
         })
     }
 

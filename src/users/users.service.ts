@@ -7,14 +7,15 @@ import {SubscribeOnCourseDto} from "./dto/subscribe-on-course.dto";
 import {CoursesService} from "../courses/courses.service";
 import {UnsubscribeFromCourseDto} from "./dto/unsubscribe-from-course.dto";
 import {UserCourses} from "../courses/user-courses.model";
-import {DeleteUserDto} from "./dto/delete-user.dto";
 import {BanUserDto} from "./dto/ban-user.dto";
-import {ApiCreatedResponse} from "@nestjs/swagger";
+import {Comment} from "../comments/comment.model";
 
 
 @Injectable()
 export class UsersService {
-    constructor(@InjectModel(User) private userRepository: typeof User, private courseService: CoursesService) {}
+    constructor(@InjectModel(User) private userRepository: typeof User, private courseService: CoursesService,
+                @InjectModel(Comment) private commentRepository: typeof Comment,
+                @InjectModel(UserCourses) private courseRepository: typeof UserCourses) {}
     async createUser(dto: CreateUserDto) {
         try {
             return await this.userRepository.create(dto);
@@ -76,10 +77,10 @@ export class UsersService {
         }
     }
 
-    async delete(dto: DeleteUserDto) {
+    async delete(user_id: number) {
         return await this.userRepository.destroy({
             where: {
-                id: dto.user_id
+                id: user_id
             }
         })
     }
@@ -103,5 +104,17 @@ export class UsersService {
         }
 
         throw new BadRequestException('Response should contains ban_reason or unban_reason field!')
+    }
+
+    async getComments(user_id: number) {
+        return await this.commentRepository.findAll({
+            where: {user_id: user_id}
+        })
+    }
+
+    async getCourses(user_id: number) {
+        return await this.courseRepository.findAll({
+            where: {user_id: user_id}
+        })
     }
 }

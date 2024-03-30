@@ -1,10 +1,31 @@
-import {Body, Controller, Delete, Get, NotFoundException, Param, Post, Put} from '@nestjs/common';
+import {
+    BadRequestException,
+    Body,
+    Controller,
+    Delete,
+    Get,
+    HttpStatus,
+    NotFoundException,
+    Param,
+    ParseIntPipe,
+    Post,
+    Put
+} from '@nestjs/common';
 import {ProblemsService} from "./problems.service";
 import {CreateProblemDto} from "./dto/create-problem.dto";
-import {DeleteProblemDto} from "./dto/delete-problem.dto";
 import {UpdateProblemDto} from "./dto/update-problem.dto";
-import {ApiBody, ApiCreatedResponse, ApiNotFoundResponse, ApiOkResponse, ApiOperation, ApiTags} from "@nestjs/swagger";
+import {
+    ApiBadRequestResponse,
+    ApiBody,
+    ApiCreatedResponse,
+    ApiNotAcceptableResponse,
+    ApiNotFoundResponse,
+    ApiOkResponse,
+    ApiOperation,
+    ApiTags
+} from "@nestjs/swagger";
 import {Problem} from "./problem.model";
+import {INTEGER} from "sequelize";
 
 
 @Controller('problems')
@@ -29,6 +50,10 @@ export class ProblemsController {
         description: 'Task not found',
         type: NotFoundException
     })
+    @ApiBadRequestResponse({
+        description: 'Unreal request body for create problem!',
+        type: BadRequestException
+    })
     async createProblem(@Body() dto: CreateProblemDto) {
         return await this.problemService.create(dto);
     }
@@ -43,39 +68,32 @@ export class ProblemsController {
         type: Problem,
         isArray: true
     })
+    @ApiNotAcceptableResponse({
+        description: "Unreal id for problem"
+    })
     async getProblem(@Param('problem_id') problem_id: number) {
         return await this.problemService.findProblem(problem_id);
     }
 
-    @Get('/in-task/:task_id')
-    @ApiOperation({
-        summary: 'Get all problems in task',
-        description: 'This endpoint return array with problems in task or empty array'
-    })
-    @ApiOkResponse({
-        description: 'Problems in task',
-        type: Problem,
-        isArray: true
-    })
-    async getProblems(@Param('task_id') task_id: number) {
-        return await this.problemService.findAll(task_id);
-    }
-
-    @Delete()
+    @Delete('/:problem_id')
     @ApiOperation({
         summary: 'Delete problem with id',
         description: 'This endpoint deletes problem and return count of deleted rows'
     })
     @ApiBody({
         description: 'Delete problem',
-        type: DeleteProblemDto
+        type: INTEGER
     })
     @ApiOkResponse({
         description: 'Count of deleted problems',
         type: Number
     })
-    async deleteProblem(@Body() dto: DeleteProblemDto) {
-        return await this.problemService.delete(dto);
+    @ApiNotAcceptableResponse({
+        description: "Unreal id for problem"
+    })
+    async deleteProblem(@Param('problem_id',
+        new ParseIntPipe({errorHttpStatusCode: HttpStatus.NOT_ACCEPTABLE})) problem_id: number) {
+        return await this.problemService.delete(problem_id);
     }
 
     @Put()
@@ -94,6 +112,10 @@ export class ProblemsController {
     @ApiNotFoundResponse({
         description: 'Task not found',
         type: NotFoundException
+    })
+    @ApiBadRequestResponse({
+        description: 'Unreal request body for update problem!',
+        type: BadRequestException
     })
     async updateProblem(@Body() dto: UpdateProblemDto) {
         return await this.problemService.update(dto);

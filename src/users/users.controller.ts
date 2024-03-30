@@ -1,21 +1,32 @@
-import {BadRequestException, Body, Controller, Delete, Get, NotFoundException, Post, Put} from '@nestjs/common';
+import {
+    BadRequestException,
+    Body,
+    Controller,
+    Delete,
+    Get, HttpStatus,
+    NotFoundException,
+    Param,
+    ParseIntPipe,
+    Post,
+    Put
+} from '@nestjs/common';
 import {CreateUserDto} from "./dto/create-user.dto";
 import {UsersService} from "./users.service";
 import {SubscribeOnCourseDto} from "./dto/subscribe-on-course.dto";
 import {UnsubscribeFromCourseDto} from "./dto/unsubscribe-from-course.dto";
-import {DeleteUserDto} from "./dto/delete-user.dto";
 import {BanUserDto} from "./dto/ban-user.dto";
 import {
     ApiBadRequestResponse,
     ApiBody,
     ApiConflictResponse,
-    ApiCreatedResponse,
+    ApiCreatedResponse, ApiNotAcceptableResponse,
     ApiNotFoundResponse,
     ApiOkResponse, ApiOperation,
     ApiTags
 } from "@nestjs/swagger";
 import {User} from "./user.model";
 import {UserCourses} from "../courses/user-courses.model";
+import {INTEGER} from "sequelize";
 
 @Controller('users')
 @ApiTags('users')
@@ -45,6 +56,9 @@ export class UsersController {
                 statusCode: 409
             }
         }
+    })
+    @ApiBadRequestResponse({
+        description: 'Unreal request body',
     })
     create(@Body() userDto: CreateUserDto){
         return this.userService.createUser(userDto);
@@ -102,20 +116,24 @@ export class UsersController {
         return await this.userService.unsubscribe(dto);
     }
 
-    @Delete()
+    @Delete('/:user_id')
     @ApiOperation({
         summary: 'Delete user',
         description: 'This endpoint deletes user from platform'
     })
     @ApiBody({
         description: 'Delete user',
-        type: DeleteUserDto,
+        type: INTEGER,
     })
     @ApiOkResponse({
         description: 'Count of deleted rows',
     })
-    async deleteUser(@Body() dto: DeleteUserDto) {
-        return await this.userService.delete(dto);
+    @ApiNotAcceptableResponse({
+        description: "Unreal id for user"
+    })
+    async deleteUser(@Param('user_id',
+        new ParseIntPipe({ errorHttpStatusCode: HttpStatus.NOT_ACCEPTABLE })) user_id: number) {
+        return await this.userService.delete(user_id);
     }
 
     @Put()
@@ -141,5 +159,41 @@ export class UsersController {
     })
     async banUser(@Body() dto: BanUserDto) {
         return await this.userService.ban(dto);
+    }
+
+    @Get('/:user_id/comments')
+    @ApiOperation({
+        summary: 'Get user\'s comments',
+        description: 'This endpoint returns all comments by user id'
+    })
+    @ApiOkResponse({
+        description: 'Get all comments',
+        isArray: true,
+        type: User
+    })
+    @ApiNotAcceptableResponse({
+        description: "Unreal id for user"
+    })
+    async getUserComments(@Param('user_id',
+        new ParseIntPipe({ errorHttpStatusCode: HttpStatus.NOT_ACCEPTABLE })) user_id: number){
+        return await this.userService.getComments(user_id);
+    }
+
+    @Get('/:user_id/courses')
+    @ApiOperation({
+        summary: 'Get user\'s courses',
+        description: 'This endpoint returns all user\'s courses by user id'
+    })
+    @ApiOkResponse({
+        description: 'Get all user\'s courses',
+        isArray: true,
+        type: UserCourses
+    })
+    @ApiNotAcceptableResponse({
+        description: "Unreal id for user"
+    })
+    async getUserCourses(@Param('user_id',
+        new ParseIntPipe({ errorHttpStatusCode: HttpStatus.NOT_ACCEPTABLE })) user_id: number){
+        return await this.userService.getCourses(user_id);
     }
 }

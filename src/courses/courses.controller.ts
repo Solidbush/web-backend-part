@@ -2,9 +2,9 @@ import {
     Body,
     Controller,
     Delete,
-    Get,
+    Get, HttpStatus,
     NotFoundException,
-    Param,
+    Param, ParseIntPipe,
     Post,
     Put,
     UploadedFile,
@@ -13,18 +13,19 @@ import {
 import {FileInterceptor} from "@nestjs/platform-express";
 import {CreateCourseDto} from "./dto/create-course.dto";
 import {CoursesService} from "./courses.service";
-import {DeleteCourseDto} from "./dto/delete-course.dto";
 import {UpdateCourseDto} from "./dto/update-course.dto";
 import {
+    ApiBadRequestResponse,
     ApiBody,
     ApiConsumes,
-    ApiCreatedResponse,
+    ApiCreatedResponse, ApiNotAcceptableResponse,
     ApiNotFoundResponse,
     ApiOkResponse,
     ApiOperation,
     ApiTags
 } from "@nestjs/swagger";
 import {Course} from "./course.model";
+import {INTEGER} from "sequelize";
 
 
 @Controller('courses')
@@ -59,6 +60,9 @@ export class CoursesController {
         description: 'Course created!',
         type: Course
     })
+    @ApiBadRequestResponse({
+        description: 'Unreal request body for create course',
+    })
     @UseInterceptors(FileInterceptor('image'))
     async createCourse(@Body() dto: CreateCourseDto, @UploadedFile() image) {
         return await this.courseService.create(dto, image)
@@ -88,25 +92,33 @@ export class CoursesController {
         type: Course,
         isArray: true
     })
-    async getCourse(@Param('course_id') course_id: number) {
+    @ApiNotAcceptableResponse({
+        description: "Unreal id for course"
+    })
+    async getCourse(@Param('course_id',
+        new ParseIntPipe({ errorHttpStatusCode: HttpStatus.NOT_ACCEPTABLE })) course_id: number) {
         return await this.courseService.getCourse(course_id);
     }
 
-    @Delete()
+    @Delete('/:course_id')
     @ApiOperation({
         summary: 'Delete course with id',
         description: 'This endpoint deletes course and return count of deleted rows'
     })
     @ApiBody({
         description: 'Delete course',
-        type: DeleteCourseDto
+        type: INTEGER
     })
     @ApiOkResponse({
         description: 'Count of deleted courses',
         type: Number
     })
-    async deleteCourse(@Body() dto: DeleteCourseDto) {
-        return await this.courseService.deleteCourse(dto);
+    @ApiNotAcceptableResponse({
+        description: "Unreal id for course"
+    })
+    async deleteCourse(@Param('course_id',
+        new ParseIntPipe({ errorHttpStatusCode: HttpStatus.NOT_ACCEPTABLE })) course_id: number) {
+        return await this.courseService.deleteCourse(course_id);
     }
 
     @Put()
@@ -139,6 +151,9 @@ export class CoursesController {
     @ApiNotFoundResponse({
         description: 'Course not found',
         type: NotFoundException
+    })
+    @ApiBadRequestResponse({
+        description: 'Unreal request body for update course',
     })
     @UseInterceptors(FileInterceptor('image'))
     async updateCourse(@Body() dto: UpdateCourseDto, @UploadedFile() image) {

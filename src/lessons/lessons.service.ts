@@ -1,36 +1,38 @@
-import { Injectable } from '@nestjs/common';
+import {Injectable, NotFoundException} from '@nestjs/common';
 import {InjectModel} from "@nestjs/sequelize";
 import {Lesson} from "./lesson.model";
 import {CreateLessonDto} from "./dto/create-lesson.dto";
-import {DeleteLessonDto} from "./dto/delete-lesson.dto";
 import {UpdateLessonDto} from "./dto/update-lesson.dto";
 import {Task} from "../tasks/task.model";
+import {Chapter} from "../chapters/chapter.model";
+import {Course} from "../courses/course.model";
+import {Paragraph} from "../paragraphs/paragraph.model";
+import {Question} from "../questions/question.model";
+import {Problem} from "../problems/problem.model";
 
 @Injectable()
 export class LessonsService {
-    constructor(@InjectModel(Lesson) private lessonRepository: typeof Lesson) {}
+    constructor(@InjectModel(Lesson) private lessonRepository: typeof Lesson,
+                @InjectModel(Course) private courseRepository: typeof Course) {}
 
     async create(dto: CreateLessonDto) {
-        return await this.lessonRepository.create(dto)
-    }
-
-    async getAll(course_id: number) {
-        return await this.lessonRepository.findAndCountAll({
-            where: {course_id: course_id},
-            include: {model: Task}
-        })
+        const course = await this.courseRepository.findByPk(dto.course_id)
+        if (course) {
+            return await this.lessonRepository.create(dto)
+        }
+        throw new NotFoundException('Courses not found')
     }
 
     async getLesson(lesson_id: number) {
         return await this.lessonRepository.findAll({
             where: {id: lesson_id},
-            include: {model: Task}
+            include: [{model: Task, include: [{model: Question}, {model: Problem}]}, {model: Chapter, include: [{model: Paragraph}]}]
         })
     }
 
-    async delete(dto: DeleteLessonDto) {
+    async delete(lesson_id: number) {
         return await this.lessonRepository.destroy({
-            where: {id: dto.lesson_id}
+            where: {id: lesson_id}
         })
     }
 

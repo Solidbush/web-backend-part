@@ -2,7 +2,6 @@ import {Injectable, NotFoundException} from '@nestjs/common';
 import {InjectModel} from "@nestjs/sequelize";
 import {Question} from "./question.model";
 import {CreateQuestionDto} from "./dto/create-question.dto";
-import {DeleteQuestionDto} from "./dto/delete-question.dto";
 import {UpdateQuestionDto} from "./dto/update-question.dto";
 import {Task} from "../tasks/task.model";
 
@@ -18,21 +17,15 @@ export class QuestionsService {
         return await this.questionRepository.create(dto);
     }
 
-    async findAll(task_id: number) {
-        return await this.questionRepository.findAll({
-            where: {task_id: task_id}
-        });
-    }
-
     async findQuestion(question_id: number) {
         return await this.questionRepository.findAll({
             where: {id: question_id}
         });
     }
 
-    async delete(dto: DeleteQuestionDto) {
+    async delete(question_id: number) {
         return await this.questionRepository.destroy({
-            where: {id: dto.question_id}
+            where: {id: question_id}
         });
     }
 

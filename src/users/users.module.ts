@@ -6,7 +6,6 @@ import {User} from "./user.model";
 import {Comment} from "../comments/comment.model";
 import {Course} from "../courses/course.model";
 import {UserCourses} from "../courses/user-courses.model";
-import {CoursesService} from "../courses/courses.service";
 import {CoursesModule} from "../courses/courses.module";
 
 @Module({

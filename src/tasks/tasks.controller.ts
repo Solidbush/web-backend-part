@@ -1,10 +1,19 @@
-import {Body, Controller, Delete, Get, NotFoundException, Param, Post, Put} from '@nestjs/common';
+import {BadRequestException, Body, Controller, Delete, Get, NotFoundException, Param, Post, Put} from '@nestjs/common';
 import {TasksService} from "./tasks.service";
-import {ApiBody, ApiCreatedResponse, ApiNotFoundResponse, ApiOkResponse, ApiOperation, ApiTags} from "@nestjs/swagger";
+import {
+    ApiBadRequestResponse,
+    ApiBody,
+    ApiCreatedResponse,
+    ApiNotAcceptableResponse,
+    ApiNotFoundResponse,
+    ApiOkResponse,
+    ApiOperation,
+    ApiTags
+} from "@nestjs/swagger";
 import {CreateTaskDto} from "./dto/create-task.dto";
 import {Task} from "./task.model";
-import {DeleteTaskDto} from "./dto/delete-task.dto";
 import {UpdateTaskDto} from "./dto/update-task.dto";
+import {INTEGER} from "sequelize";
 
 @Controller('tasks')
 @ApiTags('tasks')
@@ -32,20 +41,6 @@ export class TasksController {
         return await this.taskService.create(dto);
     }
 
-    @Get('/in-lesson/:lesson_id')
-    @ApiOperation({
-        summary: 'Get all tasks in lesson',
-        description: 'This endpoint return array with tasks in lesson or empty array'
-    })
-    @ApiOkResponse({
-        description: 'Tasks in lesson',
-        type: Task,
-        isArray: true
-    })
-    async getAllParagraphs(@Param('lesson_id') lesson_id: number) {
-        return await this.taskService.getAll(lesson_id)
-    }
-
     @Get('/:task_id')
     @ApiOperation({
         summary: 'Get task by id',
@@ -60,21 +55,24 @@ export class TasksController {
         return await this.taskService.getTask(task_id);
     }
 
-    @Delete()
+    @Delete('/:task_id')
     @ApiOperation({
         summary: 'Delete task with id',
         description: 'This endpoint deletes task and return count of deleted rows'
     })
     @ApiBody({
         description: 'Delete task',
-        type: DeleteTaskDto
+        type: INTEGER
     })
     @ApiOkResponse({
         description: 'Count of deleted tasks',
         type: Number
     })
-    async deleteParagraph(@Body() dto: DeleteTaskDto) {
-        return await this.taskService.delete(dto);
+    @ApiNotAcceptableResponse({
+        description: "Unreal id for task"
+    })
+    async deleteParagraph(@Param('task_id') task_id: number) {
+        return await this.taskService.delete(task_id);
     }
 
     @Put()
@@ -93,6 +91,10 @@ export class TasksController {
     @ApiNotFoundResponse({
         description: 'Lesson not found',
         type: NotFoundException
+    })
+    @ApiBadRequestResponse({
+        description: 'Unreal request body for update task!',
+        type: BadRequestException
     })
     async updateParagraph(@Body() dto: UpdateTaskDto) {
         return await this.taskService.update(dto);

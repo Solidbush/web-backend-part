@@ -2,7 +2,6 @@ import {Injectable, NotFoundException} from '@nestjs/common';
 import {Paragraph} from "./paragraph.model";
 import {InjectModel} from "@nestjs/sequelize";
 import {CreateParagraphDto} from "./dto/create-paragraph.dto";
-import {DeleteParagraphDto} from "./dto/delete-paragraph.dto";
 import {UpdateParagraphDto} from "./dto/update-paragraph.dto";
 import {Chapter} from "../chapters/chapter.model";
 
@@ -18,15 +17,9 @@ export class ParagraphsService {
         return await this.paragraphRepository.create({...dto})
     }
 
-    async delete(dto: DeleteParagraphDto) {
+    async delete(paragraph_id: number) {
         return await this.paragraphRepository.destroy({
-            where: {id: dto.paragraph_id}
-        })
-    }
-
-    async getAll(chapter_id: number) {
-        return await this.paragraphRepository.findAll({
-            where: {chapter_id: chapter_id}
+            where: {id: paragraph_id}
         })
     }
 

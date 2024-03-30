@@ -1,10 +1,30 @@
-import {Body, Controller, Delete, Get, NotFoundException, Param, Post, Put} from '@nestjs/common';
+import {
+    BadRequestException,
+    Body,
+    Controller,
+    Delete,
+    Get, HttpStatus,
+    NotFoundException,
+    Param,
+    ParseIntPipe,
+    Post,
+    Put
+} from '@nestjs/common';
 import {QuestionsService} from "./questions.service";
 import {CreateQuestionDto} from "./dto/create-question.dto";
-import {DeleteQuestionDto} from "./dto/delete-question.dto";
 import {UpdateQuestionDto} from "./dto/update-question.dto";
-import {ApiBody, ApiCreatedResponse, ApiNotFoundResponse, ApiOkResponse, ApiOperation, ApiTags} from "@nestjs/swagger";
+import {
+    ApiBadRequestResponse,
+    ApiBody,
+    ApiCreatedResponse,
+    ApiNotAcceptableResponse,
+    ApiNotFoundResponse,
+    ApiOkResponse,
+    ApiOperation,
+    ApiTags
+} from "@nestjs/swagger";
 import {Question} from "./question.model";
+import {INTEGER} from "sequelize";
 
 @Controller('questions')
 @ApiTags('questions')
@@ -28,6 +48,10 @@ export class QuestionsController {
         description: 'Task not found',
         type: NotFoundException
     })
+    @ApiBadRequestResponse({
+        description: 'Unreal response body for create question!',
+        type: BadRequestException
+    })
     async createQuestion(@Body() dto: CreateQuestionDto) {
         return await this.questionService.create(dto);
     }
@@ -42,39 +66,34 @@ export class QuestionsController {
         type: Question,
         isArray: true
     })
-    async getQuestion(@Param('question_id') question_id: number) {
+    @ApiNotAcceptableResponse({
+        description: "Unreal id for question"
+    })
+    async getQuestion(@Param('question_id',
+        new ParseIntPipe({ errorHttpStatusCode: HttpStatus.NOT_ACCEPTABLE })) question_id: number) {
         return await this.questionService.findQuestion(question_id);
     }
 
-    @Get('/in-task/:task_id')
-    @ApiOperation({
-        summary: 'Get all questions in task',
-        description: 'This endpoint return array with questions in task or empty array'
-    })
-    @ApiOkResponse({
-        description: 'Questions in task',
-        type: Question,
-        isArray: true
-    })
-    async getQuestions(@Param('task_id') task_id: number) {
-        return await this.questionService.findAll(task_id);
-    }
 
-    @Delete()
+    @Delete('/:question_id')
     @ApiOperation({
         summary: 'Delete question with id',
         description: 'This endpoint deletes question and return count of deleted rows'
     })
     @ApiBody({
         description: 'Delete question',
-        type: DeleteQuestionDto
+        type: INTEGER
     })
     @ApiOkResponse({
         description: 'Count of deleted questions',
         type: Number
     })
-    async deleteQuestion(@Body() dto: DeleteQuestionDto) {
-        return await this.questionService.delete(dto);
+    @ApiNotAcceptableResponse({
+        description: "Unreal id for question"
+    })
+    async deleteQuestion(@Param('question_id',
+        new ParseIntPipe({ errorHttpStatusCode: HttpStatus.NOT_ACCEPTABLE })) question_id: number) {
+        return await this.questionService.delete(question_id);
     }
 
     @Put()
@@ -93,6 +112,10 @@ export class QuestionsController {
     @ApiNotFoundResponse({
         description: 'Task not found',
         type: NotFoundException
+    })
+    @ApiBadRequestResponse({
+        description: 'Unreal response body for update question!',
+        type: BadRequestException
     })
     async updateQuestion(@Body() dto: UpdateQuestionDto) {
         return await this.questionService.update(dto);

@@ -1,31 +1,31 @@
-import { Injectable } from '@nestjs/common';
+import {Injectable, NotFoundException} from '@nestjs/common';
 import {CreateCommentDto} from "./dto/create-comment.dto";
 import {Comment} from "./comment.model";
-import {DeleteCommentDto} from "./dto/delete-comment.dto";
 import {InjectModel} from "@nestjs/sequelize";
 import {UpdateCommentDto} from "./dto/update-comment.dto";
+import {User} from "../users/user.model";
 
 @Injectable()
 export class CommentsService {
 
-    constructor(@InjectModel(Comment) private commentRepository: typeof Comment) {}
+    constructor(@InjectModel(Comment) private commentRepository: typeof Comment,
+                @InjectModel(User) private userRepository: typeof User) {}
     async create(dto: CreateCommentDto) {
-        return await this.commentRepository.create({...dto})
+        const user = await this.userRepository.findByPk(dto.user_id);
+        if (user) {
+            return await this.commentRepository.create({...dto})
+        }
+
+        throw new NotFoundException(`User with id: ${dto.user_id} not found!`)
     }
-    async delete(dto: DeleteCommentDto) {
+    async delete(comment_id: number) {
         return await this.commentRepository.destroy({
-            where: {id: dto.id, user_id: dto.user_id}
+            where: {id: comment_id}
         })
     }
 
     async getAll() {
         return await this.commentRepository.findAll();
-    }
-
-    async getComments(user_id: number) {
-        return await this.commentRepository.findAll({
-            where: {user_id: user_id}
-        })
     }
 
     async update(dto: UpdateCommentDto) {

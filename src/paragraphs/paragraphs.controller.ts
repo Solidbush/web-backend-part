@@ -1,10 +1,31 @@
-import {Body, Controller, Delete, Get, NotFoundException, Param, Post, Put} from '@nestjs/common';
+import {
+    BadRequestException,
+    Body,
+    Controller,
+    Delete,
+    Get,
+    HttpStatus,
+    NotFoundException,
+    Param,
+    ParseIntPipe,
+    Post,
+    Put
+} from '@nestjs/common';
 import {ParagraphsService} from "./paragraphs.service";
 import {CreateParagraphDto} from "./dto/create-paragraph.dto";
-import {DeleteParagraphDto} from "./dto/delete-paragraph.dto";
 import {UpdateParagraphDto} from "./dto/update-paragraph.dto";
-import {ApiBody, ApiCreatedResponse, ApiNotFoundResponse, ApiOkResponse, ApiOperation, ApiTags} from "@nestjs/swagger";
+import {
+    ApiBadRequestResponse,
+    ApiBody,
+    ApiCreatedResponse,
+    ApiNotAcceptableResponse,
+    ApiNotFoundResponse,
+    ApiOkResponse,
+    ApiOperation,
+    ApiTags
+} from "@nestjs/swagger";
 import {Paragraph} from "./paragraph.model";
+import {INTEGER} from "sequelize";
 
 @Controller('paragraphs')
 @ApiTags('paragraphs')
@@ -32,20 +53,6 @@ export class ParagraphsController {
         return await this.paragraphService.create(dto);
     }
 
-    @Get('/in-chapter/:chapter_id')
-    @ApiOperation({
-        summary: 'Get all paragraphs in chapter',
-        description: 'This endpoint return array with paragraphs in chapter or empty array'
-    })
-    @ApiOkResponse({
-        description: 'Paragraphs in chapter',
-        type: Paragraph,
-        isArray: true
-    })
-    async getAllParagraphs(@Param('chapter_id') chapter_id: number) {
-        return await this.paragraphService.getAll(chapter_id)
-    }
-
     @Get('/:paragraph_id')
     @ApiOperation({
         summary: 'Get paragraph by id',
@@ -56,25 +63,29 @@ export class ParagraphsController {
         type: Paragraph,
         isArray: true
     })
-    async getChapter(@Param('paragraph_id') paragraph_id: number) {
+    @ApiNotAcceptableResponse({
+        description: "Unreal id for paragraph"
+    })
+    async getParagraph(@Param('paragraph_id',
+        new ParseIntPipe({errorHttpStatusCode: HttpStatus.NOT_ACCEPTABLE})) paragraph_id: number) {
         return await this.paragraphService.getParagraph(paragraph_id);
     }
 
-    @Delete()
+    @Delete('/:paragraph_id')
     @ApiOperation({
         summary: 'Delete paragraph with id',
         description: 'This endpoint deletes paragraph and return count of deleted rows'
     })
     @ApiBody({
-        description: 'Delete paragraph',
-        type: DeleteParagraphDto
+        description: 'Delete paragraph bu id',
+        type: INTEGER
     })
     @ApiOkResponse({
         description: 'Count of deleted paragraphs',
         type: Number
     })
-    async deleteParagraph(@Body() dto: DeleteParagraphDto) {
-        return await this.paragraphService.delete(dto);
+    async deleteParagraph(@Param('paragraph_id') paragraph_id: number) {
+        return await this.paragraphService.delete(paragraph_id);
     }
 
     @Put()
@@ -93,6 +104,10 @@ export class ParagraphsController {
     @ApiNotFoundResponse({
         description: 'Chapter not found',
         type: NotFoundException
+    })
+    @ApiBadRequestResponse({
+        description: 'Unreal JSON for update',
+        type: BadRequestException
     })
     async updateParagraph(@Body() dto: UpdateParagraphDto) {
         return await this.paragraphService.update(dto);
