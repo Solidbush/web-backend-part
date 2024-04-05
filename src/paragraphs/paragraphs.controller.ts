@@ -84,7 +84,11 @@ export class ParagraphsController {
         description: 'Count of deleted paragraphs',
         type: Number
     })
-    async deleteParagraph(@Param('paragraph_id') paragraph_id: number) {
+    @ApiNotAcceptableResponse({
+        description: "Unreal id for paragraph"
+    })
+    async deleteParagraph(@Param('paragraph_id',
+        new ParseIntPipe({ errorHttpStatusCode: HttpStatus.NOT_ACCEPTABLE })) paragraph_id: number) {
         return await this.paragraphService.delete(paragraph_id);
     }
 

@@ -74,7 +74,7 @@ export class UsersController {
         isArray: true,
         type: User
     })
-    getAll(){
+    async getAll(){
         return this.userService.getAllUsers();
     }
 

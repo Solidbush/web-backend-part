@@ -71,7 +71,8 @@ export class ProblemsController {
     @ApiNotAcceptableResponse({
         description: "Unreal id for problem"
     })
-    async getProblem(@Param('problem_id') problem_id: number) {
+    async getProblem(@Param('problem_id',
+        new ParseIntPipe({ errorHttpStatusCode: HttpStatus.NOT_ACCEPTABLE })) problem_id: number) {
         return await this.problemService.findProblem(problem_id);
     }
 

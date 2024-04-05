@@ -1,7 +1,19 @@
-import {Body, Controller, Delete, Get, HttpStatus, NotFoundException, Param, ParseIntPipe, Post} from '@nestjs/common';
+import {
+    Body,
+    Controller,
+    Delete,
+    Get,
+    HttpStatus,
+    NotFoundException,
+    Param,
+    ParseIntPipe,
+    Post,
+    Query
+} from '@nestjs/common';
 import {CommentsService} from "./comments.service";
 import {CreateCommentDto} from "./dto/create-comment.dto";
 import {
+    ApiBadRequestResponse,
     ApiBody,
     ApiCreatedResponse,
     ApiNotAcceptableResponse, ApiNotFoundResponse,
@@ -67,7 +79,15 @@ export class CommentsController {
         type: Comment,
         isArray: true
     })
-    async getAllComments() {
-        return await this.commentService.getAll();
+    @ApiBadRequestResponse({
+        description: "Unreal query params for method"
+    })
+    async getAllComments(
+        @Query('page') page: number,
+        @Query('limit') limit: number,
+    ) {
+        page = page ? Number(page) : 1;
+        limit = limit ? Number(limit) : 10;
+        return await this.commentService.getAll(page, limit);
     }
 }

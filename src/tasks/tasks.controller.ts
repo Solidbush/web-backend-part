@@ -1,4 +1,15 @@
-import {BadRequestException, Body, Controller, Delete, Get, NotFoundException, Param, Post, Put} from '@nestjs/common';
+import {
+    BadRequestException,
+    Body,
+    Controller,
+    Delete,
+    Get, HttpStatus,
+    NotFoundException,
+    Param,
+    ParseIntPipe,
+    Post,
+    Put
+} from '@nestjs/common';
 import {TasksService} from "./tasks.service";
 import {
     ApiBadRequestResponse,
@@ -51,7 +62,11 @@ export class TasksController {
         type: Task,
         isArray: true
     })
-    async getChapter(@Param('task_id') task_id: number) {
+    @ApiNotAcceptableResponse({
+        description: "Unreal id for task"
+    })
+    async getChapter(@Param('task_id',
+        new ParseIntPipe({ errorHttpStatusCode: HttpStatus.NOT_ACCEPTABLE })) task_id: number) {
         return await this.taskService.getTask(task_id);
     }
 
@@ -71,7 +86,8 @@ export class TasksController {
     @ApiNotAcceptableResponse({
         description: "Unreal id for task"
     })
-    async deleteParagraph(@Param('task_id') task_id: number) {
+    async deleteParagraph(@Param('task_id',
+        new ParseIntPipe({ errorHttpStatusCode: HttpStatus.NOT_ACCEPTABLE })) task_id: number) {
         return await this.taskService.delete(task_id);
     }
 

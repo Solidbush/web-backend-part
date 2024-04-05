@@ -1,4 +1,15 @@
-import {Body, Controller, Delete, Get, NotFoundException, Param, Post, Put} from '@nestjs/common';
+import {
+    Body,
+    Controller,
+    Delete,
+    Get,
+    HttpStatus,
+    NotFoundException,
+    Param,
+    ParseIntPipe,
+    Post,
+    Put
+} from '@nestjs/common';
 import {ChaptersService} from "./chapters.service";
 import {ChapterCreateDto} from "./dto/chapter-crate.dto";
 import {ChapterDeleteDto} from "./dto/chapter-delete.dto";
@@ -6,7 +17,7 @@ import {ChapterUpdateDto} from "./dto/chapter-update.dto";
 import {RemoveParagraphDto} from "./dto/remove-paragraph.dto";
 import {
     ApiBody,
-    ApiCreatedResponse,
+    ApiCreatedResponse, ApiNotAcceptableResponse,
     ApiNotFoundResponse,
     ApiOkResponse,
     ApiOperation,
@@ -60,7 +71,11 @@ export class ChaptersController {
         type: Chapter,
         isArray: true
     })
-    async getChapter(@Param('chapter_id') chapter_id: number){
+    @ApiNotAcceptableResponse({
+        description: "Unreal id for chapter"
+    })
+    async getChapter(@Param('chapter_id',
+        new ParseIntPipe({ errorHttpStatusCode: HttpStatus.NOT_ACCEPTABLE })) chapter_id: number){
         return await this.chapterService.getChapter(chapter_id);
     }
 
@@ -75,7 +90,11 @@ export class ChaptersController {
         type: Chapter,
         isArray: true
     })
-    async getChapters(@Param('lesson_id') lesson_id: number) {
+    @ApiNotAcceptableResponse({
+        description: "Unreal id for lesson"
+    })
+    async getChapters(@Param('lesson_id',
+        new ParseIntPipe({ errorHttpStatusCode: HttpStatus.NOT_ACCEPTABLE })) lesson_id: number) {
         return await this.chapterService.getAll(lesson_id);
     }
 

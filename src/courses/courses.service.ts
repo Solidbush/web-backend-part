@@ -1,4 +1,4 @@
-import {Injectable, NotFoundException} from '@nestjs/common';
+import {BadRequestException, Injectable, NotFoundException} from '@nestjs/common';
 import {InjectModel} from "@nestjs/sequelize";
 import {Course} from "./course.model";
 import {FilesService} from "../files/files.service";
@@ -22,8 +22,14 @@ export class CoursesService {
         return await this.courseRepository.create({...dto, img: fileName})
     }
 
-    async getAll() {
+    async getAll(page: number, limit: number) {
+        const offset = (page - 1) * limit;
+        if (page <= 0 || limit <= 0) {
+            throw new BadRequestException(`Unreal params for method page: ${page}, limit: ${limit}`)
+        }
         return await this.courseRepository.findAll({
+            limit,
+            offset,
             include: {model: Lesson}
         });
     }

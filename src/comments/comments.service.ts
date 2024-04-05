@@ -1,4 +1,4 @@
-import {Injectable, NotFoundException} from '@nestjs/common';
+import {BadRequestException, Injectable, NotFoundException} from '@nestjs/common';
 import {CreateCommentDto} from "./dto/create-comment.dto";
 import {Comment} from "./comment.model";
 import {InjectModel} from "@nestjs/sequelize";
@@ -24,8 +24,15 @@ export class CommentsService {
         })
     }
 
-    async getAll() {
-        return await this.commentRepository.findAll();
+    async getAll(page: number, limit: number) {
+        const offset = (page - 1) * limit;
+        if (page <= 0 || limit <= 0) {
+            throw new BadRequestException(`Unreal params for method page: ${page}, limit: ${limit}`)
+        }
+        return await this.commentRepository.findAndCountAll({
+            limit,
+            offset,
+        });
     }
 
     async update(dto: UpdateCommentDto) {

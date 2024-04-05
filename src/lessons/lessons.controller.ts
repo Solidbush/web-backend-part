@@ -65,7 +65,11 @@ export class LessonsController {
         type: Lesson,
         isArray: true
     })
-    async getLesson(@Param('lesson_id') lesson_id: number){
+    @ApiNotAcceptableResponse({
+        description: "Unreal id for lesson"
+    })
+    async getLesson(@Param('lesson_id',
+        new ParseIntPipe({ errorHttpStatusCode: HttpStatus.NOT_ACCEPTABLE })) lesson_id: number){
         return await this.lessonService.getLesson(lesson_id);
     }
 

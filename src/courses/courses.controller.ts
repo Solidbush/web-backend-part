@@ -6,7 +6,7 @@ import {
     NotFoundException,
     Param, ParseIntPipe,
     Post,
-    Put,
+    Put, Query,
     UploadedFile,
     UseInterceptors
 } from '@nestjs/common';
@@ -78,8 +78,16 @@ export class CoursesController {
         type: Course,
         isArray: true
     })
-    async getAllCourses() {
-        return await this.courseService.getAll();
+    @ApiBadRequestResponse({
+        description: "Unreal query params for method"
+    })
+    async getAllCourses(
+        @Query('page') page: number,
+        @Query('limit') limit: number,
+    ) {
+        page = page ? Number(page) : 1;
+        limit = limit ? Number(limit) : 10;
+        return await this.courseService.getAll(page, limit);
     }
 
     @Get('/:course_id')
