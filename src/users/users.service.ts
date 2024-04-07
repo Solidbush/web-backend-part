@@ -9,6 +9,7 @@ import {UnsubscribeFromCourseDto} from "./dto/unsubscribe-from-course.dto";
 import {UserCourses} from "../courses/user-courses.model";
 import {BanUserDto} from "./dto/ban-user.dto";
 import {Comment} from "../comments/comment.model";
+import * as bcrypt from 'bcrypt';
 
 
 @Injectable()
@@ -18,7 +19,11 @@ export class UsersService {
                 @InjectModel(UserCourses) private courseRepository: typeof UserCourses) {}
     async createUser(dto: CreateUserDto) {
         try {
-            return await this.userRepository.create(dto);
+            const hashedPassword = await bcrypt.hash(dto.password, 10);
+            return await this.userRepository.create({
+                email: dto.email,
+                password: hashedPassword
+            });
         }
         catch (e) {
             throw new ConflictException(`User with the same email: ${dto.email} already exists`)
@@ -29,6 +34,12 @@ export class UsersService {
         return await this.userRepository.findAll({
             include: {model: Course}
         });
+    }
+
+    async findUser(email: string) {
+        return await this.userRepository.findOne({
+            where: {email: email}
+        })
     }
 
     async subscribe(dto: SubscribeOnCourseDto) {

@@ -7,7 +7,7 @@ import {
     Param, ParseIntPipe,
     Post,
     Put, Query,
-    UploadedFile,
+    UploadedFile, UseGuards,
     UseInterceptors
 } from '@nestjs/common';
 import {FileInterceptor} from "@nestjs/platform-express";
@@ -22,10 +22,11 @@ import {
     ApiNotFoundResponse,
     ApiOkResponse,
     ApiOperation,
-    ApiTags
+    ApiTags, ApiUnauthorizedResponse
 } from "@nestjs/swagger";
 import {Course} from "./course.model";
 import {INTEGER} from "sequelize";
+import {AuthGuard} from "../auth/auth.guard";
 
 
 @Controller('courses')
@@ -63,6 +64,10 @@ export class CoursesController {
     @ApiBadRequestResponse({
         description: 'Unreal request body for create course',
     })
+    @ApiUnauthorizedResponse({
+        description: 'Problems with authorization token'
+    })
+    @UseGuards(AuthGuard)
     @UseInterceptors(FileInterceptor('image'))
     async createCourse(@Body() dto: CreateCourseDto, @UploadedFile() image) {
         return await this.courseService.create(dto, image)
@@ -103,6 +108,10 @@ export class CoursesController {
     @ApiNotAcceptableResponse({
         description: "Unreal id for course"
     })
+    @ApiUnauthorizedResponse({
+        description: 'Problems with authorization token'
+    })
+    @UseGuards(AuthGuard)
     async getCourse(@Param('course_id',
         new ParseIntPipe({ errorHttpStatusCode: HttpStatus.NOT_ACCEPTABLE })) course_id: number) {
         return await this.courseService.getCourse(course_id);
@@ -124,6 +133,10 @@ export class CoursesController {
     @ApiNotAcceptableResponse({
         description: "Unreal id for course"
     })
+    @ApiUnauthorizedResponse({
+        description: 'Problems with authorization token'
+    })
+    @UseGuards(AuthGuard)
     async deleteCourse(@Param('course_id',
         new ParseIntPipe({ errorHttpStatusCode: HttpStatus.NOT_ACCEPTABLE })) course_id: number) {
         return await this.courseService.deleteCourse(course_id);
@@ -163,6 +176,10 @@ export class CoursesController {
     @ApiBadRequestResponse({
         description: 'Unreal request body for update course',
     })
+    @ApiUnauthorizedResponse({
+        description: 'Problems with authorization token'
+    })
+    @UseGuards(AuthGuard)
     @UseInterceptors(FileInterceptor('image'))
     async updateCourse(@Body() dto: UpdateCourseDto, @UploadedFile() image) {
         return await this.courseService.updateCourse(dto, image)

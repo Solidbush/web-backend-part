@@ -8,7 +8,7 @@ import {
     Param,
     ParseIntPipe,
     Post,
-    Put
+    Put, UseGuards
 } from '@nestjs/common';
 import {ChaptersService} from "./chapters.service";
 import {ChapterCreateDto} from "./dto/chapter-crate.dto";
@@ -21,9 +21,10 @@ import {
     ApiNotFoundResponse,
     ApiOkResponse,
     ApiOperation,
-    ApiTags
+    ApiTags, ApiUnauthorizedResponse
 } from "@nestjs/swagger";
 import {Chapter} from "./chapter.model";
+import {AuthGuard} from "../auth/auth.guard";
 
 @Controller('chapters')
 @ApiTags('chapters')
@@ -43,6 +44,10 @@ export class ChaptersController {
         description: 'Chapter created!',
         type: Chapter
     })
+    @ApiUnauthorizedResponse({
+        description: 'Problems with authorization token'
+    })
+    @UseGuards(AuthGuard)
     async createChapter(@Body() dto: ChapterCreateDto) {
         return await this.chapterService.create(dto);
     }
@@ -57,6 +62,10 @@ export class ChaptersController {
         type: Chapter,
         isArray: true
     })
+    @ApiUnauthorizedResponse({
+        description: 'Problems with authorization token'
+    })
+    @UseGuards(AuthGuard)
     async allChapters() {
         return await this.chapterService.allChapters();
     }
@@ -74,6 +83,10 @@ export class ChaptersController {
     @ApiNotAcceptableResponse({
         description: "Unreal id for chapter"
     })
+    @ApiUnauthorizedResponse({
+        description: 'Problems with authorization token'
+    })
+    @UseGuards(AuthGuard)
     async getChapter(@Param('chapter_id',
         new ParseIntPipe({ errorHttpStatusCode: HttpStatus.NOT_ACCEPTABLE })) chapter_id: number){
         return await this.chapterService.getChapter(chapter_id);
@@ -93,6 +106,10 @@ export class ChaptersController {
     @ApiNotAcceptableResponse({
         description: "Unreal id for lesson"
     })
+    @ApiUnauthorizedResponse({
+        description: 'Problems with authorization token'
+    })
+    @UseGuards(AuthGuard)
     async getChapters(@Param('lesson_id',
         new ParseIntPipe({ errorHttpStatusCode: HttpStatus.NOT_ACCEPTABLE })) lesson_id: number) {
         return await this.chapterService.getAll(lesson_id);
@@ -111,6 +128,10 @@ export class ChaptersController {
         description: 'Count of deleted chapters',
         type: Number
     })
+    @ApiUnauthorizedResponse({
+        description: 'Problems with authorization token'
+    })
+    @UseGuards(AuthGuard)
     async deleteChapter(@Body() dto: ChapterDeleteDto) {
         return await this.chapterService.delete(dto);
     }
@@ -132,6 +153,10 @@ export class ChaptersController {
         description: 'Chapter not found',
         type: NotFoundException
     })
+    @ApiUnauthorizedResponse({
+        description: 'Problems with authorization token'
+    })
+    @UseGuards(AuthGuard)
     async updateChapter(@Body() dto: ChapterUpdateDto) {
         return await this.chapterService.update(dto);
     }
@@ -153,6 +178,10 @@ export class ChaptersController {
         description: 'Chapter not found',
         type: NotFoundException
     })
+    @ApiUnauthorizedResponse({
+        description: 'Problems with authorization token'
+    })
+    @UseGuards(AuthGuard)
     async removeParagraph(@Body() dto: RemoveParagraphDto) {
         return await this.chapterService.remove(dto);
     }

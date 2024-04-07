@@ -1,4 +1,5 @@
 import {
+    BadRequestException,
     Body,
     Controller,
     Delete,
@@ -8,7 +9,7 @@ import {
     Param,
     ParseIntPipe,
     Post,
-    Query
+    Query, UseGuards
 } from '@nestjs/common';
 import {CommentsService} from "./comments.service";
 import {CreateCommentDto} from "./dto/create-comment.dto";
@@ -19,10 +20,11 @@ import {
     ApiNotAcceptableResponse, ApiNotFoundResponse,
     ApiOkResponse,
     ApiOperation,
-    ApiTags
+    ApiTags, ApiUnauthorizedResponse,
 } from "@nestjs/swagger";
 import {Comment} from "./comment.model";
 import {INTEGER} from "sequelize";
+import {AuthGuard} from "../auth/auth.guard";
 
 @Controller('comments')
 @ApiTags('comments')
@@ -45,6 +47,14 @@ export class CommentsController {
         description: 'User not found',
         type: NotFoundException
     })
+    @ApiBadRequestResponse({
+        description: "Unreal body for comment",
+        type: BadRequestException
+    })
+    @ApiUnauthorizedResponse({
+        description: 'Problems with authorization token'
+    })
+    @UseGuards(AuthGuard)
     async createComment(@Body() dto: CreateCommentDto) {
         return await this.commentService.create(dto)
     }
@@ -64,6 +74,10 @@ export class CommentsController {
     @ApiNotAcceptableResponse({
         description: "Unreal id for comment"
     })
+    @ApiUnauthorizedResponse({
+        description: 'Problems with authorization token'
+    })
+    @UseGuards(AuthGuard)
     async deleteComment(@Param('comment_id',
         new ParseIntPipe({ errorHttpStatusCode: HttpStatus.NOT_ACCEPTABLE })) comment_id: number) {
         return await this.commentService.delete(comment_id);

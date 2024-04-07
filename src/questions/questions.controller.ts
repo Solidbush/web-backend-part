@@ -8,7 +8,7 @@ import {
     Param,
     ParseIntPipe,
     Post,
-    Put
+    Put, UseGuards
 } from '@nestjs/common';
 import {QuestionsService} from "./questions.service";
 import {CreateQuestionDto} from "./dto/create-question.dto";
@@ -21,10 +21,11 @@ import {
     ApiNotFoundResponse,
     ApiOkResponse,
     ApiOperation,
-    ApiTags
+    ApiTags, ApiUnauthorizedResponse
 } from "@nestjs/swagger";
 import {Question} from "./question.model";
 import {INTEGER} from "sequelize";
+import {AuthGuard} from "../auth/auth.guard";
 
 @Controller('questions')
 @ApiTags('questions')
@@ -52,6 +53,10 @@ export class QuestionsController {
         description: 'Unreal response body for create question!',
         type: BadRequestException
     })
+    @ApiUnauthorizedResponse({
+        description: 'Problems with authorization token'
+    })
+    @UseGuards(AuthGuard)
     async createQuestion(@Body() dto: CreateQuestionDto) {
         return await this.questionService.create(dto);
     }
@@ -69,6 +74,10 @@ export class QuestionsController {
     @ApiNotAcceptableResponse({
         description: "Unreal id for question"
     })
+    @ApiUnauthorizedResponse({
+        description: 'Problems with authorization token'
+    })
+    @UseGuards(AuthGuard)
     async getQuestion(@Param('question_id',
         new ParseIntPipe({ errorHttpStatusCode: HttpStatus.NOT_ACCEPTABLE })) question_id: number) {
         return await this.questionService.findQuestion(question_id);
@@ -91,6 +100,10 @@ export class QuestionsController {
     @ApiNotAcceptableResponse({
         description: "Unreal id for question"
     })
+    @ApiUnauthorizedResponse({
+        description: 'Problems with authorization token'
+    })
+    @UseGuards(AuthGuard)
     async deleteQuestion(@Param('question_id',
         new ParseIntPipe({ errorHttpStatusCode: HttpStatus.NOT_ACCEPTABLE })) question_id: number) {
         return await this.questionService.delete(question_id);
@@ -117,6 +130,10 @@ export class QuestionsController {
         description: 'Unreal response body for update question!',
         type: BadRequestException
     })
+    @ApiUnauthorizedResponse({
+        description: 'Problems with authorization token'
+    })
+    @UseGuards(AuthGuard)
     async updateQuestion(@Body() dto: UpdateQuestionDto) {
         return await this.questionService.update(dto);
     }

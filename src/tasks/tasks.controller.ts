@@ -8,7 +8,7 @@ import {
     Param,
     ParseIntPipe,
     Post,
-    Put
+    Put, UseGuards
 } from '@nestjs/common';
 import {TasksService} from "./tasks.service";
 import {
@@ -19,12 +19,13 @@ import {
     ApiNotFoundResponse,
     ApiOkResponse,
     ApiOperation,
-    ApiTags
+    ApiTags, ApiUnauthorizedResponse
 } from "@nestjs/swagger";
 import {CreateTaskDto} from "./dto/create-task.dto";
 import {Task} from "./task.model";
 import {UpdateTaskDto} from "./dto/update-task.dto";
 import {INTEGER} from "sequelize";
+import {AuthGuard} from "../auth/auth.guard";
 
 @Controller('tasks')
 @ApiTags('tasks')
@@ -48,6 +49,10 @@ export class TasksController {
         description: 'Lesson not found',
         type: NotFoundException
     })
+    @ApiUnauthorizedResponse({
+        description: 'Problems with authorization token'
+    })
+    @UseGuards(AuthGuard)
     async createParagraph(@Body() dto: CreateTaskDto) {
         return await this.taskService.create(dto);
     }
@@ -65,6 +70,10 @@ export class TasksController {
     @ApiNotAcceptableResponse({
         description: "Unreal id for task"
     })
+    @ApiUnauthorizedResponse({
+        description: 'Problems with authorization token'
+    })
+    @UseGuards(AuthGuard)
     async getChapter(@Param('task_id',
         new ParseIntPipe({ errorHttpStatusCode: HttpStatus.NOT_ACCEPTABLE })) task_id: number) {
         return await this.taskService.getTask(task_id);
@@ -86,6 +95,10 @@ export class TasksController {
     @ApiNotAcceptableResponse({
         description: "Unreal id for task"
     })
+    @ApiUnauthorizedResponse({
+        description: 'Problems with authorization token'
+    })
+    @UseGuards(AuthGuard)
     async deleteParagraph(@Param('task_id',
         new ParseIntPipe({ errorHttpStatusCode: HttpStatus.NOT_ACCEPTABLE })) task_id: number) {
         return await this.taskService.delete(task_id);
@@ -112,6 +125,10 @@ export class TasksController {
         description: 'Unreal request body for update task!',
         type: BadRequestException
     })
+    @ApiUnauthorizedResponse({
+        description: 'Problems with authorization token'
+    })
+    @UseGuards(AuthGuard)
     async updateParagraph(@Body() dto: UpdateTaskDto) {
         return await this.taskService.update(dto);
     }

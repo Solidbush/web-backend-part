@@ -8,7 +8,7 @@ import {
     Param,
     ParseIntPipe,
     Post,
-    Put
+    Put, UseGuards
 } from '@nestjs/common';
 import {CreateUserDto} from "./dto/create-user.dto";
 import {UsersService} from "./users.service";
@@ -22,11 +22,12 @@ import {
     ApiCreatedResponse, ApiNotAcceptableResponse,
     ApiNotFoundResponse,
     ApiOkResponse, ApiOperation,
-    ApiTags
+    ApiTags, ApiUnauthorizedResponse
 } from "@nestjs/swagger";
 import {User} from "./user.model";
 import {UserCourses} from "../courses/user-courses.model";
 import {INTEGER} from "sequelize";
+import {AuthGuard} from "../auth/auth.guard";
 
 @Controller('users')
 @ApiTags('users')
@@ -74,6 +75,10 @@ export class UsersController {
         isArray: true,
         type: User
     })
+    @ApiUnauthorizedResponse({
+        description: 'Problems with authorization token'
+    })
+    @UseGuards(AuthGuard)
     async getAll(){
         return this.userService.getAllUsers();
     }
@@ -95,6 +100,10 @@ export class UsersController {
         description: 'User not found',
         type: NotFoundException
     })
+    @ApiUnauthorizedResponse({
+        description: 'Problems with authorization token'
+    })
+    @UseGuards(AuthGuard)
     async subscribeOnCourse(@Body() dto: SubscribeOnCourseDto) {
         return await this.userService.subscribe(dto);
     }
@@ -112,6 +121,10 @@ export class UsersController {
         description: 'User not found',
         type: NotFoundException
     })
+    @ApiUnauthorizedResponse({
+        description: 'Problems with authorization token'
+    })
+    @UseGuards(AuthGuard)
     async unsubscribeFromCourse(@Body() dto: UnsubscribeFromCourseDto) {
         return await this.userService.unsubscribe(dto);
     }
@@ -131,6 +144,10 @@ export class UsersController {
     @ApiNotAcceptableResponse({
         description: "Unreal id for user"
     })
+    @ApiUnauthorizedResponse({
+        description: 'Problems with authorization token'
+    })
+    @UseGuards(AuthGuard)
     async deleteUser(@Param('user_id',
         new ParseIntPipe({ errorHttpStatusCode: HttpStatus.NOT_ACCEPTABLE })) user_id: number) {
         return await this.userService.delete(user_id);
@@ -157,6 +174,10 @@ export class UsersController {
         description: 'Response should contains ban_reason or unban_reason field!',
         type: BadRequestException
     })
+    @ApiUnauthorizedResponse({
+        description: 'Problems with authorization token'
+    })
+    @UseGuards(AuthGuard)
     async banUser(@Body() dto: BanUserDto) {
         return await this.userService.ban(dto);
     }
@@ -174,6 +195,10 @@ export class UsersController {
     @ApiNotAcceptableResponse({
         description: "Unreal id for user"
     })
+    @ApiUnauthorizedResponse({
+        description: 'Problems with authorization token'
+    })
+    @UseGuards(AuthGuard)
     async getUserComments(@Param('user_id',
         new ParseIntPipe({ errorHttpStatusCode: HttpStatus.NOT_ACCEPTABLE })) user_id: number){
         return await this.userService.getComments(user_id);
@@ -192,6 +217,10 @@ export class UsersController {
     @ApiNotAcceptableResponse({
         description: "Unreal id for user"
     })
+    @ApiUnauthorizedResponse({
+        description: 'Problems with authorization token'
+    })
+    @UseGuards(AuthGuard)
     async getUserCourses(@Param('user_id',
         new ParseIntPipe({ errorHttpStatusCode: HttpStatus.NOT_ACCEPTABLE })) user_id: number){
         return await this.userService.getCourses(user_id);

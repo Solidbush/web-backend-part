@@ -9,7 +9,7 @@ import {
     Param,
     ParseIntPipe,
     Post,
-    Put
+    Put, UseGuards
 } from '@nestjs/common';
 import {ProblemsService} from "./problems.service";
 import {CreateProblemDto} from "./dto/create-problem.dto";
@@ -22,10 +22,11 @@ import {
     ApiNotFoundResponse,
     ApiOkResponse,
     ApiOperation,
-    ApiTags
+    ApiTags, ApiUnauthorizedResponse
 } from "@nestjs/swagger";
 import {Problem} from "./problem.model";
 import {INTEGER} from "sequelize";
+import {AuthGuard} from "../auth/auth.guard";
 
 
 @Controller('problems')
@@ -54,6 +55,10 @@ export class ProblemsController {
         description: 'Unreal request body for create problem!',
         type: BadRequestException
     })
+    @ApiUnauthorizedResponse({
+        description: 'Problems with authorization token'
+    })
+    @UseGuards(AuthGuard)
     async createProblem(@Body() dto: CreateProblemDto) {
         return await this.problemService.create(dto);
     }
@@ -71,6 +76,10 @@ export class ProblemsController {
     @ApiNotAcceptableResponse({
         description: "Unreal id for problem"
     })
+    @ApiUnauthorizedResponse({
+        description: 'Problems with authorization token'
+    })
+    @UseGuards(AuthGuard)
     async getProblem(@Param('problem_id',
         new ParseIntPipe({ errorHttpStatusCode: HttpStatus.NOT_ACCEPTABLE })) problem_id: number) {
         return await this.problemService.findProblem(problem_id);
@@ -92,6 +101,10 @@ export class ProblemsController {
     @ApiNotAcceptableResponse({
         description: "Unreal id for problem"
     })
+    @ApiUnauthorizedResponse({
+        description: 'Problems with authorization token'
+    })
+    @UseGuards(AuthGuard)
     async deleteProblem(@Param('problem_id',
         new ParseIntPipe({errorHttpStatusCode: HttpStatus.NOT_ACCEPTABLE})) problem_id: number) {
         return await this.problemService.delete(problem_id);
@@ -118,6 +131,10 @@ export class ProblemsController {
         description: 'Unreal request body for update problem!',
         type: BadRequestException
     })
+    @ApiUnauthorizedResponse({
+        description: 'Problems with authorization token'
+    })
+    @UseGuards(AuthGuard)
     async updateProblem(@Body() dto: UpdateProblemDto) {
         return await this.problemService.update(dto);
     }
