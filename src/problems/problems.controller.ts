@@ -15,7 +15,7 @@ import {ProblemsService} from "./problems.service";
 import {CreateProblemDto} from "./dto/create-problem.dto";
 import {UpdateProblemDto} from "./dto/update-problem.dto";
 import {
-    ApiBadRequestResponse,
+    ApiBadRequestResponse, ApiBearerAuth,
     ApiBody,
     ApiCreatedResponse,
     ApiNotAcceptableResponse,
@@ -58,6 +58,7 @@ export class ProblemsController {
     @ApiUnauthorizedResponse({
         description: 'Problems with authorization token'
     })
+    @ApiBearerAuth()
     @UseGuards(AuthGuard)
     async createProblem(@Body() dto: CreateProblemDto) {
         return await this.problemService.create(dto);
@@ -79,6 +80,7 @@ export class ProblemsController {
     @ApiUnauthorizedResponse({
         description: 'Problems with authorization token'
     })
+    @ApiBearerAuth()
     @UseGuards(AuthGuard)
     async getProblem(@Param('problem_id',
         new ParseIntPipe({ errorHttpStatusCode: HttpStatus.NOT_ACCEPTABLE })) problem_id: number) {
@@ -104,6 +106,7 @@ export class ProblemsController {
     @ApiUnauthorizedResponse({
         description: 'Problems with authorization token'
     })
+    @ApiBearerAuth()
     @UseGuards(AuthGuard)
     async deleteProblem(@Param('problem_id',
         new ParseIntPipe({errorHttpStatusCode: HttpStatus.NOT_ACCEPTABLE})) problem_id: number) {
@@ -134,6 +137,7 @@ export class ProblemsController {
     @ApiUnauthorizedResponse({
         description: 'Problems with authorization token'
     })
+    @ApiBearerAuth()
     @UseGuards(AuthGuard)
     async updateProblem(@Body() dto: UpdateProblemDto) {
         return await this.problemService.update(dto);

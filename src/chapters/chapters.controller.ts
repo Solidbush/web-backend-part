@@ -16,6 +16,7 @@ import {ChapterDeleteDto} from "./dto/chapter-delete.dto";
 import {ChapterUpdateDto} from "./dto/chapter-update.dto";
 import {RemoveParagraphDto} from "./dto/remove-paragraph.dto";
 import {
+    ApiBearerAuth,
     ApiBody,
     ApiCreatedResponse, ApiNotAcceptableResponse,
     ApiNotFoundResponse,
@@ -47,6 +48,7 @@ export class ChaptersController {
     @ApiUnauthorizedResponse({
         description: 'Problems with authorization token'
     })
+    @ApiBearerAuth()
     @UseGuards(AuthGuard)
     async createChapter(@Body() dto: ChapterCreateDto) {
         return await this.chapterService.create(dto);
@@ -65,6 +67,7 @@ export class ChaptersController {
     @ApiUnauthorizedResponse({
         description: 'Problems with authorization token'
     })
+    @ApiBearerAuth()
     @UseGuards(AuthGuard)
     async allChapters() {
         return await this.chapterService.allChapters();
@@ -86,6 +89,7 @@ export class ChaptersController {
     @ApiUnauthorizedResponse({
         description: 'Problems with authorization token'
     })
+    @ApiBearerAuth()
     @UseGuards(AuthGuard)
     async getChapter(@Param('chapter_id',
         new ParseIntPipe({ errorHttpStatusCode: HttpStatus.NOT_ACCEPTABLE })) chapter_id: number){
@@ -109,6 +113,7 @@ export class ChaptersController {
     @ApiUnauthorizedResponse({
         description: 'Problems with authorization token'
     })
+    @ApiBearerAuth()
     @UseGuards(AuthGuard)
     async getChapters(@Param('lesson_id',
         new ParseIntPipe({ errorHttpStatusCode: HttpStatus.NOT_ACCEPTABLE })) lesson_id: number) {
@@ -131,6 +136,7 @@ export class ChaptersController {
     @ApiUnauthorizedResponse({
         description: 'Problems with authorization token'
     })
+    @ApiBearerAuth()
     @UseGuards(AuthGuard)
     async deleteChapter(@Body() dto: ChapterDeleteDto) {
         return await this.chapterService.delete(dto);
@@ -156,6 +162,7 @@ export class ChaptersController {
     @ApiUnauthorizedResponse({
         description: 'Problems with authorization token'
     })
+    @ApiBearerAuth()
     @UseGuards(AuthGuard)
     async updateChapter(@Body() dto: ChapterUpdateDto) {
         return await this.chapterService.update(dto);
@@ -181,6 +188,7 @@ export class ChaptersController {
     @ApiUnauthorizedResponse({
         description: 'Problems with authorization token'
     })
+    @ApiBearerAuth()
     @UseGuards(AuthGuard)
     async removeParagraph(@Body() dto: RemoveParagraphDto) {
         return await this.chapterService.remove(dto);

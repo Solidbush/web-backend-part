@@ -12,7 +12,7 @@ import {
 } from '@nestjs/common';
 import {TasksService} from "./tasks.service";
 import {
-    ApiBadRequestResponse,
+    ApiBadRequestResponse, ApiBearerAuth,
     ApiBody,
     ApiCreatedResponse,
     ApiNotAcceptableResponse,
@@ -52,6 +52,7 @@ export class TasksController {
     @ApiUnauthorizedResponse({
         description: 'Problems with authorization token'
     })
+    @ApiBearerAuth()
     @UseGuards(AuthGuard)
     async createParagraph(@Body() dto: CreateTaskDto) {
         return await this.taskService.create(dto);
@@ -73,6 +74,7 @@ export class TasksController {
     @ApiUnauthorizedResponse({
         description: 'Problems with authorization token'
     })
+    @ApiBearerAuth()
     @UseGuards(AuthGuard)
     async getChapter(@Param('task_id',
         new ParseIntPipe({ errorHttpStatusCode: HttpStatus.NOT_ACCEPTABLE })) task_id: number) {
@@ -98,6 +100,7 @@ export class TasksController {
     @ApiUnauthorizedResponse({
         description: 'Problems with authorization token'
     })
+    @ApiBearerAuth()
     @UseGuards(AuthGuard)
     async deleteParagraph(@Param('task_id',
         new ParseIntPipe({ errorHttpStatusCode: HttpStatus.NOT_ACCEPTABLE })) task_id: number) {
@@ -128,6 +131,7 @@ export class TasksController {
     @ApiUnauthorizedResponse({
         description: 'Problems with authorization token'
     })
+    @ApiBearerAuth()
     @UseGuards(AuthGuard)
     async updateParagraph(@Body() dto: UpdateTaskDto) {
         return await this.taskService.update(dto);

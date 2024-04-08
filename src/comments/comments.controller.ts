@@ -14,7 +14,7 @@ import {
 import {CommentsService} from "./comments.service";
 import {CreateCommentDto} from "./dto/create-comment.dto";
 import {
-    ApiBadRequestResponse,
+    ApiBadRequestResponse, ApiBearerAuth,
     ApiBody,
     ApiCreatedResponse,
     ApiNotAcceptableResponse, ApiNotFoundResponse,
@@ -54,6 +54,7 @@ export class CommentsController {
     @ApiUnauthorizedResponse({
         description: 'Problems with authorization token'
     })
+    @ApiBearerAuth()
     @UseGuards(AuthGuard)
     async createComment(@Body() dto: CreateCommentDto) {
         return await this.commentService.create(dto)
@@ -77,6 +78,7 @@ export class CommentsController {
     @ApiUnauthorizedResponse({
         description: 'Problems with authorization token'
     })
+    @ApiBearerAuth()
     @UseGuards(AuthGuard)
     async deleteComment(@Param('comment_id',
         new ParseIntPipe({ errorHttpStatusCode: HttpStatus.NOT_ACCEPTABLE })) comment_id: number) {

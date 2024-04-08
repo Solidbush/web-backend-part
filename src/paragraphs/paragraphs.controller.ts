@@ -15,7 +15,7 @@ import {ParagraphsService} from "./paragraphs.service";
 import {CreateParagraphDto} from "./dto/create-paragraph.dto";
 import {UpdateParagraphDto} from "./dto/update-paragraph.dto";
 import {
-    ApiBadRequestResponse,
+    ApiBadRequestResponse, ApiBearerAuth,
     ApiBody,
     ApiCreatedResponse,
     ApiNotAcceptableResponse,
@@ -54,6 +54,7 @@ export class ParagraphsController {
         description: 'Problems with authorization token'
     })
     @UseGuards(AuthGuard)
+    @ApiBearerAuth()
     async createParagraph(@Body() dto: CreateParagraphDto) {
         return await this.paragraphService.create(dto);
     }
@@ -74,6 +75,7 @@ export class ParagraphsController {
     @ApiUnauthorizedResponse({
         description: 'Problems with authorization token'
     })
+    @ApiBearerAuth()
     @UseGuards(AuthGuard)
     async getParagraph(@Param('paragraph_id',
         new ParseIntPipe({errorHttpStatusCode: HttpStatus.NOT_ACCEPTABLE})) paragraph_id: number) {
@@ -99,6 +101,7 @@ export class ParagraphsController {
     @ApiUnauthorizedResponse({
         description: 'Problems with authorization token'
     })
+    @ApiBearerAuth()
     @UseGuards(AuthGuard)
     async deleteParagraph(@Param('paragraph_id',
         new ParseIntPipe({ errorHttpStatusCode: HttpStatus.NOT_ACCEPTABLE })) paragraph_id: number) {
@@ -129,6 +132,7 @@ export class ParagraphsController {
     @ApiUnauthorizedResponse({
         description: 'Problems with authorization token'
     })
+    @ApiBearerAuth()
     @UseGuards(AuthGuard)
     async updateParagraph(@Body() dto: UpdateParagraphDto) {
         return await this.paragraphService.update(dto);

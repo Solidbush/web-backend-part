@@ -16,7 +16,7 @@ import {SubscribeOnCourseDto} from "./dto/subscribe-on-course.dto";
 import {UnsubscribeFromCourseDto} from "./dto/unsubscribe-from-course.dto";
 import {BanUserDto} from "./dto/ban-user.dto";
 import {
-    ApiBadRequestResponse,
+    ApiBadRequestResponse, ApiBearerAuth,
     ApiBody,
     ApiConflictResponse,
     ApiCreatedResponse, ApiNotAcceptableResponse,
@@ -78,6 +78,7 @@ export class UsersController {
     @ApiUnauthorizedResponse({
         description: 'Problems with authorization token'
     })
+    @ApiBearerAuth()
     @UseGuards(AuthGuard)
     async getAll(){
         return this.userService.getAllUsers();
@@ -103,6 +104,7 @@ export class UsersController {
     @ApiUnauthorizedResponse({
         description: 'Problems with authorization token'
     })
+    @ApiBearerAuth()
     @UseGuards(AuthGuard)
     async subscribeOnCourse(@Body() dto: SubscribeOnCourseDto) {
         return await this.userService.subscribe(dto);
@@ -124,6 +126,7 @@ export class UsersController {
     @ApiUnauthorizedResponse({
         description: 'Problems with authorization token'
     })
+    @ApiBearerAuth()
     @UseGuards(AuthGuard)
     async unsubscribeFromCourse(@Body() dto: UnsubscribeFromCourseDto) {
         return await this.userService.unsubscribe(dto);
@@ -147,6 +150,7 @@ export class UsersController {
     @ApiUnauthorizedResponse({
         description: 'Problems with authorization token'
     })
+    @ApiBearerAuth()
     @UseGuards(AuthGuard)
     async deleteUser(@Param('user_id',
         new ParseIntPipe({ errorHttpStatusCode: HttpStatus.NOT_ACCEPTABLE })) user_id: number) {
@@ -177,6 +181,7 @@ export class UsersController {
     @ApiUnauthorizedResponse({
         description: 'Problems with authorization token'
     })
+    @ApiBearerAuth()
     @UseGuards(AuthGuard)
     async banUser(@Body() dto: BanUserDto) {
         return await this.userService.ban(dto);
@@ -198,6 +203,7 @@ export class UsersController {
     @ApiUnauthorizedResponse({
         description: 'Problems with authorization token'
     })
+    @ApiBearerAuth()
     @UseGuards(AuthGuard)
     async getUserComments(@Param('user_id',
         new ParseIntPipe({ errorHttpStatusCode: HttpStatus.NOT_ACCEPTABLE })) user_id: number){
@@ -220,6 +226,7 @@ export class UsersController {
     @ApiUnauthorizedResponse({
         description: 'Problems with authorization token'
     })
+    @ApiBearerAuth()
     @UseGuards(AuthGuard)
     async getUserCourses(@Param('user_id',
         new ParseIntPipe({ errorHttpStatusCode: HttpStatus.NOT_ACCEPTABLE })) user_id: number){

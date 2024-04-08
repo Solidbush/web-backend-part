@@ -15,7 +15,7 @@ import {CreateCourseDto} from "./dto/create-course.dto";
 import {CoursesService} from "./courses.service";
 import {UpdateCourseDto} from "./dto/update-course.dto";
 import {
-    ApiBadRequestResponse,
+    ApiBadRequestResponse, ApiBearerAuth,
     ApiBody,
     ApiConsumes,
     ApiCreatedResponse, ApiNotAcceptableResponse,
@@ -67,6 +67,7 @@ export class CoursesController {
     @ApiUnauthorizedResponse({
         description: 'Problems with authorization token'
     })
+    @ApiBearerAuth()
     @UseGuards(AuthGuard)
     @UseInterceptors(FileInterceptor('image'))
     async createCourse(@Body() dto: CreateCourseDto, @UploadedFile() image) {
@@ -111,6 +112,7 @@ export class CoursesController {
     @ApiUnauthorizedResponse({
         description: 'Problems with authorization token'
     })
+    @ApiBearerAuth()
     @UseGuards(AuthGuard)
     async getCourse(@Param('course_id',
         new ParseIntPipe({ errorHttpStatusCode: HttpStatus.NOT_ACCEPTABLE })) course_id: number) {
@@ -136,6 +138,7 @@ export class CoursesController {
     @ApiUnauthorizedResponse({
         description: 'Problems with authorization token'
     })
+    @ApiBearerAuth()
     @UseGuards(AuthGuard)
     async deleteCourse(@Param('course_id',
         new ParseIntPipe({ errorHttpStatusCode: HttpStatus.NOT_ACCEPTABLE })) course_id: number) {
@@ -179,6 +182,7 @@ export class CoursesController {
     @ApiUnauthorizedResponse({
         description: 'Problems with authorization token'
     })
+    @ApiBearerAuth()
     @UseGuards(AuthGuard)
     @UseInterceptors(FileInterceptor('image'))
     async updateCourse(@Body() dto: UpdateCourseDto, @UploadedFile() image) {

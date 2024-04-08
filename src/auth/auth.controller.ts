@@ -2,6 +2,7 @@ import {Body, Controller, Get, Post, UseGuards, Request} from '@nestjs/common';
 import {AuthService} from "./auth.service";
 import {AuthGuard} from "./auth.guard";
 import {
+    ApiBearerAuth,
     ApiBody,
     ApiCreatedResponse,
     ApiOkResponse,
@@ -39,6 +40,7 @@ export class AuthController {
     }
 
     @UseGuards(AuthGuard)
+    @ApiBearerAuth()
     @Get('profile')
     @ApiOperation({
         summary: 'Check user\'s token',
