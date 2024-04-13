@@ -12,6 +12,7 @@ async function start() {
       .setTitle('Online courses platform')
       .setDescription('Документация сервиса')
       .addTag('Solidbush')
+      .addBearerAuth()
       .build()
   const document = SwaggerModule.createDocument(app, config)
   SwaggerModule.setup('/api/docs', app, document)

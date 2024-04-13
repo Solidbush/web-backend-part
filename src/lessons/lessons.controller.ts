@@ -8,21 +8,22 @@ import {
     Param,
     ParseIntPipe,
     Post,
-    Put
+    Put, UseGuards
 } from '@nestjs/common';
 import {LessonsService} from "./lessons.service";
 import {CreateLessonDto} from "./dto/create-lesson.dto";
 import {UpdateLessonDto} from "./dto/update-lesson.dto";
 import {
-    ApiBadRequestResponse,
+    ApiBadRequestResponse, ApiBearerAuth,
     ApiBody,
     ApiNotAcceptableResponse, ApiNotFoundResponse,
     ApiOkResponse,
     ApiOperation,
-    ApiTags
+    ApiTags, ApiUnauthorizedResponse
 } from "@nestjs/swagger";
 import {Lesson} from "./lesson.model";
 import {INTEGER} from "sequelize";
+import {AuthGuard} from "../auth/auth.guard";
 
 
 @Controller('lessons')
@@ -51,6 +52,11 @@ export class LessonsController {
         description: 'Course not found',
         type: NotFoundException
     })
+    @ApiUnauthorizedResponse({
+        description: 'Problems with authorization token'
+    })
+    @ApiBearerAuth()
+    @UseGuards(AuthGuard)
     async createLesson(@Body() dto: CreateLessonDto) {
         return await this.lessonService.create(dto);
     }
@@ -68,6 +74,11 @@ export class LessonsController {
     @ApiNotAcceptableResponse({
         description: "Unreal id for lesson"
     })
+    @ApiUnauthorizedResponse({
+        description: 'Problems with authorization token'
+    })
+    @ApiBearerAuth()
+    @UseGuards(AuthGuard)
     async getLesson(@Param('lesson_id',
         new ParseIntPipe({ errorHttpStatusCode: HttpStatus.NOT_ACCEPTABLE })) lesson_id: number){
         return await this.lessonService.getLesson(lesson_id);
@@ -83,6 +94,11 @@ export class LessonsController {
         type: Lesson,
         isArray: true
     })
+    @ApiUnauthorizedResponse({
+        description: 'Problems with authorization token'
+    })
+    @ApiBearerAuth()
+    @UseGuards(AuthGuard)
     async getAllLessons() {
         return await this.lessonService.allLessons();
     }
@@ -103,6 +119,11 @@ export class LessonsController {
     @ApiNotAcceptableResponse({
         description: "Unreal id for lesson"
     })
+    @ApiUnauthorizedResponse({
+        description: 'Problems with authorization token'
+    })
+    @ApiBearerAuth()
+    @UseGuards(AuthGuard)
     async deleteLesson(@Param('lesson_id',
         new ParseIntPipe({ errorHttpStatusCode: HttpStatus.NOT_ACCEPTABLE })) lesson_id: number) {
         return await this.lessonService.delete(lesson_id);
@@ -125,6 +146,11 @@ export class LessonsController {
         description: 'Unreal request body for update lesson',
         type: BadRequestException
     })
+    @ApiUnauthorizedResponse({
+        description: 'Problems with authorization token'
+    })
+    @ApiBearerAuth()
+    @UseGuards(AuthGuard)
     async updateLesson(@Body() dto: UpdateLessonDto) {
         return await this.lessonService.update(dto);
     }

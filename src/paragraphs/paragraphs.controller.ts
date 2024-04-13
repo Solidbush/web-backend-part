@@ -9,23 +9,24 @@ import {
     Param,
     ParseIntPipe,
     Post,
-    Put
+    Put, UseGuards
 } from '@nestjs/common';
 import {ParagraphsService} from "./paragraphs.service";
 import {CreateParagraphDto} from "./dto/create-paragraph.dto";
 import {UpdateParagraphDto} from "./dto/update-paragraph.dto";
 import {
-    ApiBadRequestResponse,
+    ApiBadRequestResponse, ApiBearerAuth,
     ApiBody,
     ApiCreatedResponse,
     ApiNotAcceptableResponse,
     ApiNotFoundResponse,
     ApiOkResponse,
     ApiOperation,
-    ApiTags
+    ApiTags, ApiUnauthorizedResponse
 } from "@nestjs/swagger";
 import {Paragraph} from "./paragraph.model";
 import {INTEGER} from "sequelize";
+import {AuthGuard} from "../auth/auth.guard";
 
 @Controller('paragraphs')
 @ApiTags('paragraphs')
@@ -49,6 +50,11 @@ export class ParagraphsController {
         description: 'Chapter not found',
         type: NotFoundException
     })
+    @ApiUnauthorizedResponse({
+        description: 'Problems with authorization token'
+    })
+    @UseGuards(AuthGuard)
+    @ApiBearerAuth()
     async createParagraph(@Body() dto: CreateParagraphDto) {
         return await this.paragraphService.create(dto);
     }
@@ -66,6 +72,11 @@ export class ParagraphsController {
     @ApiNotAcceptableResponse({
         description: "Unreal id for paragraph"
     })
+    @ApiUnauthorizedResponse({
+        description: 'Problems with authorization token'
+    })
+    @ApiBearerAuth()
+    @UseGuards(AuthGuard)
     async getParagraph(@Param('paragraph_id',
         new ParseIntPipe({errorHttpStatusCode: HttpStatus.NOT_ACCEPTABLE})) paragraph_id: number) {
         return await this.paragraphService.getParagraph(paragraph_id);
@@ -87,6 +98,11 @@ export class ParagraphsController {
     @ApiNotAcceptableResponse({
         description: "Unreal id for paragraph"
     })
+    @ApiUnauthorizedResponse({
+        description: 'Problems with authorization token'
+    })
+    @ApiBearerAuth()
+    @UseGuards(AuthGuard)
     async deleteParagraph(@Param('paragraph_id',
         new ParseIntPipe({ errorHttpStatusCode: HttpStatus.NOT_ACCEPTABLE })) paragraph_id: number) {
         return await this.paragraphService.delete(paragraph_id);
@@ -113,6 +129,11 @@ export class ParagraphsController {
         description: 'Unreal JSON for update',
         type: BadRequestException
     })
+    @ApiUnauthorizedResponse({
+        description: 'Problems with authorization token'
+    })
+    @ApiBearerAuth()
+    @UseGuards(AuthGuard)
     async updateParagraph(@Body() dto: UpdateParagraphDto) {
         return await this.paragraphService.update(dto);
     }

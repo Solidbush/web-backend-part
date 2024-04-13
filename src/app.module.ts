@@ -26,6 +26,7 @@ import {Question} from "./questions/question.model";
 import {Problem} from "./problems/problem.model";
 import {Course} from "./courses/course.model";
 import {UserCourses} from "./courses/user-courses.model";
+import { AuthModule } from './auth/auth.module';
 
 
 @Module({
@@ -56,7 +57,8 @@ import {UserCourses} from "./courses/user-courses.model";
         ProblemsModule,
         QuestionsModule,
         TasksModule,
-        LessonsModule],
+        LessonsModule,
+        AuthModule],
     controllers: [AppController],
     providers: [AppService]
 })
