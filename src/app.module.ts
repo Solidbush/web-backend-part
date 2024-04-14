@@ -27,6 +27,7 @@ import { Problem } from './problems/problem.model';
 import { Course } from './courses/course.model';
 import { UserCourses } from './courses/user-courses.model';
 import { AuthModule } from './auth/auth.module';
+import {SocketService} from "./soket/socket.service";
 
 @Module({
   imports: [
@@ -71,6 +72,6 @@ import { AuthModule } from './auth/auth.module';
     AuthModule,
   ],
   controllers: [AppController],
-  providers: [AppService],
+  providers: [AppService, SocketService],
 })
 export class AppModule {}

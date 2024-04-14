@@ -8,16 +8,19 @@ import { Comment } from './comment.model';
 import { InjectModel } from '@nestjs/sequelize';
 import { UpdateCommentDto } from './dto/update-comment.dto';
 import { User } from '../users/user.model';
+import {SocketService} from "../soket/socket.service";
 
 @Injectable()
 export class CommentsService {
   constructor(
     @InjectModel(Comment) private commentRepository: typeof Comment,
     @InjectModel(User) private userRepository: typeof User,
+    private readonly socketService: SocketService
   ) {}
   async create(dto: CreateCommentDto) {
     const user = await this.userRepository.findByPk(dto.user_id);
     if (user) {
+      this.socketService.sendToRoom('commentRoom', 'newComment', dto.text);
       return await this.commentRepository.create({ ...dto });
     }
 

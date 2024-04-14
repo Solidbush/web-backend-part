@@ -4,9 +4,10 @@ import { User } from '../users/user.model';
 import { SequelizeModule } from '@nestjs/sequelize';
 import { Comment } from './comment.model';
 import { CommentsController } from './comments.controller';
+import {SocketService} from "../soket/socket.service";
 
 @Module({
-  providers: [CommentsService],
+  providers: [CommentsService, SocketService],
   imports: [SequelizeModule.forFeature([User, Comment])],
   controllers: [CommentsController],
 })
